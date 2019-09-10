@@ -8,7 +8,22 @@ const FETCH_HEADERS = {
     "X-Parse-Application-Id": AppID,
 }
 
+Parse.initialize(AppID);
+Parse.serverURL = RestURL;
+
 class ParseApi {
+
+    static async getItemList() {
+        const response = await fetch(ParseURL + 'getItemList', {
+          method: "POST",
+          headers: FETCH_HEADERS,      
+        });
+    
+        console.log(response);
+    
+        return response.json(); // get body stream
+    }
+
     static async sayHello() {
         const response = await fetch(ParseURL + 'whoami', {
             method: "POST",
@@ -25,30 +40,25 @@ class ParseApi {
     }
 
     static async signUp(username,password){
-        const response = await fetch(ParseURL + 'signUp',{
-          method: "POST",
-          headers : FETCH_HEADERS,
-          body: JSON.stringify({
-            username,
-            password,
-          })
-        });
-        console.log(response);
-        return response.json();
+        const response = await Parse.Cloud.run('signUp', {username, password})
     }
 
     static async signIn(username,password){
-        const response = await fetch(RestURL  + 'login',{
-            method: "POST",
-            headers: FETCH_HEADERS,
-            body: JSON.stringify({
-                username,
-                password,   
-            })
-        });
-        console.log(response);
-        return response.json();
+        const user = await Parse.User.logIn(username,password);
+        return user.toJSON();
     }
+    // static async signIn(username,password){
+    //     const response = await fetch(RestURL  + 'login',{
+    //         method: "POST",
+    //         headers: FETCH_HEADERS,
+    //         body: JSON.stringify({
+    //             username,
+    //             password,   
+    //         })
+    //     });
+    //     console.log(response);
+    //     return response.json();
+    // }
 
     static async signOut(session_token){
         const response = await fetch(RestURL  + 'logout',{

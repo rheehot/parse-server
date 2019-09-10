@@ -2,6 +2,7 @@
 
 <body>
     <button onclick="hello()">SayHello</button>
+    <button onclick="getItemList()">아이템</button>
     <div class="signup">
         <input id="input-username" type="text" placeholder="username">
         <input id="input-password" type="password" placeholder="password">
@@ -10,10 +11,16 @@
         <button onclick="signOut()">로그아웃</button>
     </div>
 </body>
+
+<script src="../js/parse.min.js"></script>
 <script src="../js/parseAPI.js"></script>
 <script>
     async function hello() {
         const result = await ParseApi.sayHello();
+        console.log(result);
+    }
+    async function getItemList() {
+        const result = await ParseApi.getItemList();
         console.log(result);
     }
     async function signUp() {
@@ -35,13 +42,7 @@
         localStorage.setItem('session', result.sessionToken);
     }
     async function signOut(){
-        temp = localStorage.getItem('session')
-        const response = await ParseApi.signOut(temp);
-        //특정 값만 지우는 부분
-        console.log(temp)
-        localStorage.removeItem(temp)
-        // console.log(response.sessionToken)
-        // localStorage.clear()
+        const response = await ParseApi.signOut(localStorage.getItem('session'));
     }
 </script>
 
