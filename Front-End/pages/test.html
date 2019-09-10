@@ -1,0 +1,48 @@
+<html>
+
+<body>
+    <button onclick="hello()">SayHello</button>
+    <div class="signup">
+        <input id="input-username" type="text" placeholder="username">
+        <input id="input-password" type="password" placeholder="password">
+        <button onclick="signUp()">회원가입</button>
+        <button onclick="signIn()">로그인</button>
+        <button onclick="signOut()">로그아웃</button>
+    </div>
+</body>
+<script src="../js/parseAPI.js"></script>
+<script>
+    async function hello() {
+        const result = await ParseApi.sayHello();
+        console.log(result);
+    }
+    async function signUp() {
+        const username = document.getElementById('input-username').value;
+        const password = document.getElementById('input-password').value;
+        console.log(username, password);
+
+        const result = await ParseApi.signUp(username, password);
+        console.log(result);
+    }
+    async function signIn() {
+        const username = document.getElementById('input-username').value;
+        const password = document.getElementById('input-password').value;
+        console.log(username, password);
+
+        const result = await ParseApi.signIn(username, password);
+        console.log(result);
+        console.log(result.sessionToken);
+        localStorage.setItem('session', result.sessionToken);
+    }
+    async function signOut(){
+        temp = localStorage.getItem('session')
+        const response = await ParseApi.signOut(temp);
+        //특정 값만 지우는 부분
+        console.log(temp)
+        localStorage.removeItem(temp)
+        // console.log(response.sessionToken)
+        // localStorage.clear()
+    }
+</script>
+
+</html>
