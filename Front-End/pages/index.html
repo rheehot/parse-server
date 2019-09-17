@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>IDOL </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" media="screen" href="../css/index.css">
+</head>
+
+<body>
+  <div class="body">
+    <div class="header">
+      <div class="header-contents">
+        <a href="../pages/index.html" class="logo col-s-6">
+          <h1>IDOL POP</h1>
+        </a>
+        <a href="javascript:void(0);" class="icon col-s-6" onclick="hamburgBarToggle()">
+          <img src="../../images/ic-menu.svg" class="ic_menu">
+        </a>
+        <nav id="headerNav" class="topnav">
+          <button class="close-button" onclick="hamburgBarToggle()">
+            <img src="../../images/ic-leave.svg">
+          </button>
+          <div class="nav-items">
+            <a href="#" class="active Header-Text">HOME</a>
+            <a href="../pages/myIdol.html" class="Header-Text">MyIdol</a>
+          </div>
+          <a href="../pages/login.html" class="login-container">
+            Login
+          </a>
+          <button onclick="ParseApi.logout()" class="login-container" id="logout-btn" style="display:none">
+            Logout
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <div class="full-width-contents">
+      <img src="https://miro.medium.com/max/256/1*ScCQRqiRp2NZK0yHN-moGQ.jpeg">
+    </div>
+
+    <div class="contents">
+      <div class="idol-lists-container">
+        <div class="title view-all-container row-container">
+          <div class="Big-Title">IDOL Lists</div>
+          <a class="Header-Text" href="javascript:void(0);">
+            View All
+          </a>
+        </div>
+
+        <div class="category">
+
+          <div class="container">
+            <div class="img-title-tag-list" id="dynamic-list"></div>
+          </div>
+          <div class="container">
+            <div class="img-title-tag-list" id="purchased-list">
+              <!-- 유저가 구매한 내역을 담을 영역 -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <div class="contents">
+        <div class="bottom-container">
+          <div class="term">
+            <div class="link-container Tab-Selected">
+              <a>IDOL POP</a>
+            </div>
+            <a>jeffgukang@gmail.com</a>
+            <div class="row-container">
+              <a>Term of Service</a>&nbsp | &nbsp<a>Privacy Policy</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  function hamburgBarToggle() {
+    var x = document.getElementById("headerNav");
+    if (x.className === "topnav") {
+      x.className += " re sponsive";
+    } else {
+      x.className = "topnav";
+    }
+  }
+</script>
+<script src="../js/parse.min.js"></script>
+<script src="../js/parseAPI.js"></script>
+<script src='../../templates/idol-list.js'></script>
+<script>
+  getIdolList();
+
+  const user = ParseApi.checkCurrentUser();
+  if (user) {
+    console.log(user);
+    const ele = document.querySelector('.header .login-container')
+    document.getElementById("logout-btn").style.display = "";
+    ele.innerHTML = user.username;
+  }
+</script>
+<script>
+  async function purchaseItem(id) {
+    const ele = document.getElementById(id);
+
+    const item = {
+      objectId: id,
+      count: 1
+    }
+    try {
+      const result = await ParseApi.purchaseItem(item);
+      // console.log(result);
+      ele.querySelector('.quantity').innerHTML = '상품 수: ' + result.count;
+      location.reload() //
+    } catch (error) {
+      alert(error);
+    }
+  }
+</script>
+<script>
+  async function showPurchasedItem(id) {
+    const ele = document.getElementById(id);
+    const item = {
+      objectId: id
+    }
+    const container = document.getElementById('purchased-list');
+    const result = await ParseApi.getUserItemList(item);
+
+    let htmls = [];
+    result.forEach(element => {
+      const { count, objectId } = element;
+      const { name, price, group, description, imgUrl } = element.character;
+
+      const html = `<div class="item row-container" id="${objectId}">` +
+        `<img src="${imgUrl}" class="profile">` +
+        `<div class="column-container">` +
+        `<div class="title idol-Name">${name}</div>` +
+        `<div class="description">${description}</div>` +
+        `<div class="tags Hashtag">` +
+        `<span class="tag">${group}</span>` +
+        `</div>` +
+        `</div>` +
+        `<div class="column-container subinfo-container">` +
+        `<span class="Sub-Text quantity">보유 수량: ${count}</span>` +
+        `<span class="Sub-Text">$${price}</span>` +
+        `</div>` +
+        `<button class="sell-button sell" onclick="sell('${objectId}')">Sell</button>` +
+        `</div>`;
+
+      const e = document.createElement('div');
+      e.innerHTML = html;
+
+      container.appendChild(e);
+    });
+  }
+
+  showPurchasedItem();
+</script>
+
+</html>
